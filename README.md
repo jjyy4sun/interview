@@ -1,13 +1,12 @@
 # C/C++ 面试知识总结
 
-为 2018 年春招总结的 C/C++ 面试知识，只为复习、分享。知识点与图片部分来自网络，侵删。欢迎 star，欢迎 issues。
-
-[![Join the chat at https://gitter.im/cppInterview/Lobby](https://badges.gitter.im/cppInterview/Lobby.svg)](https://gitter.im/cppInterview/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+为 2018 年春招总结的 C/C++ 面试知识，只为复习、分享。部分知识点与图片来自网络，侵删。欢迎 star，欢迎 issues。
 
 ## 使用建议
 
-* `Ctrl+F`：快速查找定位知识点
-* `TOC导航`：配合 [jawil/GayHub](https://github.com/jawil/GayHub) 插件使用更佳
+* `Ctrl + F`：快速查找定位知识点
+* `TOC 导航`：使用 [jawil/GayHub](https://github.com/jawil/GayHub) 插件快速目录跳转
+* `T`：按 `T` 激活文件查找器快速查找 / 跳转文件
 
 ## 目录
 
@@ -33,6 +32,17 @@
 ## C/C++
 
 ### const
+
+#### 作用
+
+1. 修饰变量，说明该变量不可以被改变；
+2. 修饰指针，分为指向常量的指针和指针常量；
+3. 常量引用，经常用于形参类型，即避免了拷贝，又避免了函数对值的修改；
+4. 修饰成员函数，说明该成员函数内不能修改成员变量。
+
+#### 使用
+
+<details><summary>const 使用</summary> 
 
 ```cpp
 // 类
@@ -79,23 +89,7 @@ const int* function6();     // 返回一个指向常量的指针变量，使用�
 int* const function7();     // 返回一个指向变量的常指针，使用：int* const p = function7();
 ```
 
-#### 作用
-
-1. 修饰变量，说明该变量不可以被改变；
-2. 修饰指针，分为指向常量的指针和指针常量；
-3. 常量引用，经常用于形参类型，即避免了拷贝，又避免了函数对值的修改；
-4. 修饰成员函数，说明该成员函数内不能修改成员变量。
-
-### volatile
-
-```cpp
-volatile int i = 10; 
-```
-
-* volatile 关键字是一种类型修饰符，用它声明的类型变量表示可以被某些编译器未知的因素（操作系统、硬件、其它线程等）更改。
-* volatile 关键字声明的变量，每次访问时都必须从内存中取出值（没有被 volatile 修饰的变量，可能由于编译器的优化，从 CPU 寄存器中取值）
-* const 可以是 volatile （如只读的状态寄存器）
-* 指针可以是 volatile
+</details>
 
 ### static
 
@@ -112,11 +106,11 @@ volatile int i = 10;
 2. 当对一个对象调用成员函数时，编译程序先将对象的地址赋给 `this` 指针，然后调用成员函数，每次成员函数存取数据成员时，由隐含使用 `this` 指针。
 3. 当一个成员函数被调用时，自动向它传递一个隐含的参数，该参数是一个指向这个成员函数所在的对象的指针。
 4. `this` 指针被隐含地声明为: `ClassName *const this`，这意味着不能给 `this` 指针赋值；在 `ClassName` 类的 `const` 成员函数中，`this` 指针的类型为：`const ClassName* const`，这说明不能对 `this` 指针所指向的这种对象是不可修改的（即不能对这种对象的数据成员进行赋值操作）；
-5. 由于 `this` 并不是一个常规变量，所以，不能取得 `this` 的地址。
+5. `this` 并不是一个常规变量，而是个右值，所以不能取得 `this` 的地址（不能 `&this`）。
 6. 在以下场景中，经常需要显式引用 `this` 指针：
-        1. 为实现对象的链式引用；
-        2. 为避免对同一对象进行赋值操作；
-        3. 在实现一些数据结构时，如 `list`。
+    1. 为实现对象的链式引用；
+    2. 为避免对同一对象进行赋值操作；
+    3. 在实现一些数据结构时，如 `list`。
 
 ### inline 内联函数
 
@@ -130,6 +124,9 @@ volatile int i = 10;
 
 #### 使用
 
+<details><summary>inline 使用</summary> 
+
+
 ```cpp
 // 声明1（加 inline，建议使用）
 inline int functionName(int first, int secend,...);
@@ -141,7 +138,9 @@ int functionName(int first, int secend,...);
 inline int functionName(int first, int secend,...) {/****/};
 ```
 
-#### 编译器对inline函数的处理步骤
+</details>
+
+#### 编译器对 inline 函数的处理步骤
 
 1. 将 inline 函数体复制到 inline 函数调用点处； 
 2. 为所用 inline 函数中的局部变量分配内存空间； 
@@ -170,6 +169,9 @@ inline int functionName(int first, int secend,...) {/****/};
 * 虚函数可以是内联函数，内联是可以修饰虚函数的，但是当虚函数表现多态性的时候不能内联。
 * 内联是在编译器建议编译器内联，而虚函数的多态性在运行期，编译器无法知道运行期调用哪个代码，因此虚函数表现为多态性时（运行期）不可以内联。
 * `inline virtual` 唯一可以内联的时候是：编译器知道所调用的对象是哪个类（如 `Base::who()`），这只有在编译器具有实际对象而不是对象的指针或引用时才会发生。
+
+<details><summary>虚函数内联使用</summary> 
+
 
 ```cpp
 #include <iostream>  
@@ -211,11 +213,11 @@ int main()
 } 
 ```
 
+</details>
+
 ### assert()
 
-断言，是宏，而非函数。assert 宏的原型定义在`<assert.h>`（C）、`<cassert>`（C++）中，其作用是如果它的条件返回错误，则终止程序执行。
-
-如
+断言，是宏，而非函数。assert 宏的原型定义在`<assert.h>`（C）、`<cassert>`（C++）中，其作用是如果它的条件返回错误，则终止程序执行。如：
 
 ```cpp
 assert( p != NULL );
@@ -230,7 +232,8 @@ assert( p != NULL );
 
 设定结构体、联合以及类成员变量以 n 字节方式对齐
 
-如
+<details><summary>#pragma pack(n) 使用</summary> 
+
 
 ```cpp
 #pragma pack(push)  // 保存对齐状态
@@ -246,12 +249,39 @@ struct test
 #pragma pack(pop)   // 恢复对齐状态
 ```
 
+</details>
+
+### 位域
+
+```cpp
+Bit mode: 2;    // mode 占 2 位
+```
+
+类可以将其（非静态）数据成员定义为位域（bit-field），在一个位域中含有一定数量的二进制位。当一个程序需要向其他程序或硬件设备传递二进制数据时，通常会用到位域。
+
+* 位域在内存中的布局是与机器有关的
+* 位域的类型必须是整型或枚举类型，带符号类型中的位域的行为将因具体实现而定
+* 取地址运算符（&）不能作用于位域，任何指针都无法指向类的位域
+
+### volatile
+
+```cpp
+volatile int i = 10; 
+```
+
+* volatile 关键字是一种类型修饰符，用它声明的类型变量表示可以被某些编译器未知的因素（操作系统、硬件、其它线程等）更改。所以使用 volatile 告诉编译器不应对这样的对象进行优化。
+* volatile 关键字声明的变量，每次访问时都必须从内存中取出值（没有被 volatile 修饰的变量，可能由于编译器的优化，从 CPU 寄存器中取值）
+* const 可以是 volatile （如只读的状态寄存器）
+* 指针可以是 volatile
+
 ### extern "C"
 
 * 被 extern 限定的函数或变量是 extern 类型的
 * 被 `extern "C"` 修饰的变量和函数是按照 C 语言方式编译和连接的
 
 `extern "C"` 的作用是让 C++ 编译器将 `extern "C"` 声明的代码当作 C 语言代码处理，可以避免 C++ 因符号修饰导致代码不能和C语言库中的符号进行链接的问题。
+
+<details><summary>extern "C" 使用</summary> 
 
 ```cpp
 #ifdef __cplusplus
@@ -264,6 +294,8 @@ void *memset(void *, int, size_t);
 }
 #endif
 ```
+
+</details>
 
 ### struct 和 typedef struct
 
@@ -336,6 +368,57 @@ int main() {
     1. 默认的继承访问权限。struct 是 public 的，class 是 private 的。  
     2. struct 作为数据结构的实现体，它默认的数据访问控制是 public 的，而 class 作为对象的实现体，它默认的成员变量访问控制是 private 的。
 
+### union 联合
+
+联合（union）是一种节省空间的特殊的类，一个 union 可以有多个数据成员，但是在任意时刻只有一个数据成员可以有值。当某个成员被赋值后其他成员变为未定义状态。联合有如下特点：
+
+* 默认访问控制符为 public
+* 可以含有构造函数、析构函数
+* 不能含有引用类型的成员
+* 不能继承自其他类，不能作为基类
+* 不能含有虚函数
+* 匿名 union 在定义所在作用域可直接访问 union 成员
+* 匿名 union 不能包含 protected 成员或 private 成员
+* 全局匿名联合必须是静态（static）的
+
+<details><summary>union 使用</summary> 
+
+```cpp
+#include<iostream>
+
+union UnionTest {
+    UnionTest() : i(10) {};
+    int i;
+    double d;
+};
+
+static union {
+    int i;
+    double d;
+};
+
+int main() {
+    UnionTest u;
+
+    union {
+        int i;
+        double d;
+    };
+
+    std::cout << u.i << std::endl;  // 输出 UnionTest 联合的 10
+
+    ::i = 20;
+    std::cout << ::i << std::endl;  // 输出全局静态匿名联合的 20
+
+    i = 30;
+    std::cout << i << std::endl;    // 输出局部匿名联合的 30
+
+    return 0;
+}
+```
+
+</details>
+
 ### C 实现 C++ 类
 
 [C 语言实现封装、继承和多态](http://dongxicheng.org/cpp/ooc/)
@@ -344,7 +427,7 @@ int main() {
 
 explicit 修饰的构造函数可用来防止隐式转换
 
-如下
+<details><summary>explicit 使用</summary> 
 
 ```cpp
 class Test1
@@ -378,7 +461,9 @@ int main()
 }
 ```
 
-### frend 友元类和友元函数
+</details>
+
+### friend 友元类和友元函数
 
 * 能访问私有成员  
 * 破坏封装性
@@ -386,23 +471,55 @@ int main()
 * 友元关系的单向性
 * 友元声明的形式及数量不受限制
 
-### using 引入命名空间成员
+### using
+
+#### using 声明
+
+一条 `using 声明` 语句一次只引入命名空间的一个成员。它使得我们可以清楚知道程序中所引用的到底是哪个名字。如：
 
 ```cpp
-using namespace_name::name
+using namespace_name::name;
 ```
 
-#### 尽量不要使用 `using namespace std;` 污染命名空间
+#### 构造函数的 using 声明【C++11】
+
+在 C++11 中，派生类能够重用其直接基类定义的构造函数。
+
+```cpp
+class Derived : Base {
+public:
+    using Base::Base;
+    /* ... */
+};
+```
+
+如上 using 声明，对于基类的每个构造函数，编译器都生成一个与之对应（形参列表完全相同）的派生类构造函数。生成如下类型构造函数：
+
+```cpp
+derived(parms) : base(args) { }
+```
+
+#### using 指示
+
+`using 指示` 使得某个特定命名空间中所有名字都可见，这样我们就无需再为它们添加任何前缀限定符了。如：
+
+```cpp
+using namespace_name name;
+```
+
+#### 尽量少使用 `using 指示` 污染命名空间
 
 > 一般说来，使用 using 命令比使用 using 编译命令更安全，这是由于它**只导入了制定的名称**。如果该名称与局部名称发生冲突，编译器将**发出指示**。using编译命令导入所有的名称，包括可能并不需要的名称。如果与局部名称发生冲突，则**局部名称将覆盖名称空间版本**，而编译器**并不会发出警告**。另外，名称空间的开放性意味着名称空间的名称可能分散在多个地方，这使得难以准确知道添加了哪些名称。
 
-尽量不要使用
+<details><summary>using 使用</summary> 
+
+尽量少使用 `using 指示`
 
 ```cpp
 using namespace std;
 ```
 
-应该使用
+应该多使用 `using 声明`
 
 ```cpp
 int x;
@@ -421,28 +538,109 @@ cin >> x;
 cout << x << endl;
 ```
 
+</details>
+
 ### :: 范围解析运算符
 
-`::` 可以加在类型名称（类、类成员、成员函数、变量等）前，表示作用域为全局命名空间
+#### 分类
 
-如
+1. 全局作用域符（`::name`）：用于类型名称（类、类成员、成员函数、变量等）前，表示作用域为全局命名空间
+2. 类作用域符（`class::name`）：用于表示指定类型的作用域范围是具体某个类的
+3. 命名空间作用域符（`namespace::name`）:用于表示指定类型的作用域范围是具体某个命名空间的
+
+<details><summary>:: 使用</summary> 
 
 ```cpp
-int count = 0;      // global count
+int count = 0;        // 全局（::）的 count
+
+class A {
+public:
+    static int count; // 类 A 的 count（A::count）
+};
 
 int main() {
-  int count = 0;    // local count
-  ::count = 1;      // set global count to 1
-  count = 2;        // set local count to 2
-  return 0;
+    ::count = 1;      // 设置全局的 count 的值为 1
+
+    A::count = 2;     // 设置类 A 的 count 为 2
+
+    int count = 0;    // 局部的 count
+    count = 3;        // 设置局部的 count 的值为 3
+
+    return 0;
 }
 ```
 
+</details>
+
+### enum 枚举类型
+
+#### 限定作用域的枚举类型
+
+```cpp
+enum class open_modes { input, output, append };
+```
+
+#### 不限定作用域的枚举类型
+
+```cpp
+enum color { red, yellow, green };
+enum { floatPrec = 6, doublePrec = 10 };
+```
+
+### decltype
+
+decltype 关键字用于检查实体的声明类型或表达式的类型及值分类。语法：
+
+```cpp
+decltype ( expression )
+```
+
+<details><summary>decltype 使用</summary> 
+
+```cpp
+// 尾置返回允许我们在参数列表之后声明返回类型
+template <typename It>
+auto fcn(It beg, It end) -> decltype(*beg)
+{
+    // 处理序列
+    return *beg;    // 返回序列中一个元素的引用
+}
+// 为了使用模板参数成员，必须用 typename
+template <typename It>
+auto fcn2(It beg, It end) -> typename remove_reference<decltype(*beg)>::type
+{
+    // 处理序列
+    return *beg;    // 返回序列中一个元素的拷贝
+}
+```
+
+</details>
+
+### 引用
+
+#### 左值引用
+
+常规引用，一般表示对象的身份。
+
+#### 右值引用
+
+右值引用就是必须绑定到右值（一个临时对象、将要销毁的对象）的引用，一般表示对象的值。
+
+右值引用可实现转移语义（Move Sementics）和精确传递（Perfect Forwarding），它的主要目的有两个方面：
+
+* 消除两个对象交互时不必要的对象拷贝，节省运算存储资源，提高效率。
+* 能够更简洁明确地定义泛型函数。
+
+#### 引用折叠
+
+* `X& &`、`X& &&`、`X&& &` 可折叠成 `X&`
+* `X&& &&` 可折叠成 `X&&`
+
 ### 宏
 
-* 宏定义可以实现类似于函数的功能，但是它终归不是函数，而宏定义中括弧中的“参数”也不是真的参数，在宏展开的时候对 “参数” 进行的是一对一的替换。 
+* 宏定义可以实现类似于函数的功能，但是它终归不是函数，而宏定义中括弧中的“参数”也不是真的参数，在宏展开的时候对 “参数” 进行的是一对一的替换。
 
-### 初始化列表
+### 成员初始化列表
 
 好处
 
@@ -452,6 +650,64 @@ int main() {
   2. 引用类型，引用必须在定义的时候初始化，并且不能重新赋值，所以也要写在初始化列表里面
   3. 没有默认构造函数的类类型，因为使用初始化列表可以不必调用默认构造函数来初始化，而是直接调用拷贝构造函数初始化。
 
+### initializer_list 列表初始化【C++11】
+
+用花括号初始化器列表列表初始化一个对象，其中对应构造函数接受一个 `std::initializer_list` 参数.
+
+<details><summary>initializer_list 使用</summary> 
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <initializer_list>
+ 
+template <class T>
+struct S {
+    std::vector<T> v;
+    S(std::initializer_list<T> l) : v(l) {
+         std::cout << "constructed with a " << l.size() << "-element list\n";
+    }
+    void append(std::initializer_list<T> l) {
+        v.insert(v.end(), l.begin(), l.end());
+    }
+    std::pair<const T*, std::size_t> c_arr() const {
+        return {&v[0], v.size()};  // 在 return 语句中复制列表初始化
+                                   // 这不使用 std::initializer_list
+    }
+};
+ 
+template <typename T>
+void templated_fn(T) {}
+ 
+int main()
+{
+    S<int> s = {1, 2, 3, 4, 5}; // 复制初始化
+    s.append({6, 7, 8});      // 函数调用中的列表初始化
+ 
+    std::cout << "The vector size is now " << s.c_arr().second << " ints:\n";
+ 
+    for (auto n : s.v)
+        std::cout << n << ' ';
+    std::cout << '\n';
+ 
+    std::cout << "Range-for over brace-init-list: \n";
+ 
+    for (int x : {-1, -2, -3}) // auto 的规则令此带范围 for 工作
+        std::cout << x << ' ';
+    std::cout << '\n';
+ 
+    auto al = {10, 11, 12};   // auto 的特殊规则
+ 
+    std::cout << "The list bound to auto has size() = " << al.size() << '\n';
+ 
+//    templated_fn({1, 2, 3}); // 编译错误！“ {1, 2, 3} ”不是表达式，
+                             // 它无类型，故 T 无法推导
+    templated_fn<std::initializer_list<int>>({1, 2, 3}); // OK
+    templated_fn<std::vector<int>>({1, 2, 3});           // 也 OK
+}
+```
+
+</details>
 
 ### 面向对象
 
@@ -507,6 +763,8 @@ public:
 * 构造函数不能是虚函数（因为在调用构造函数时，虚表指针并没有在对象的内存空间中，必须要构造函数调用完成后才会形成虚表指针）
 * 内联函数不能是表现多态性时的虚函数，解释见：[虚函数（virtual）可以是内联函数（inline）吗？](https://github.com/huihut/interview#%E8%99%9A%E5%87%BD%E6%95%B0virtual%E5%8F%AF%E4%BB%A5%E6%98%AF%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0inline%E5%90%97)
 
+<details><summary>动态多态使用</summary> 
+
 ```cpp
 class Shape                     // 形状类
 {
@@ -543,7 +801,13 @@ int main()
 }
 ```
 
-* 虚析构函数
+</details>
+
+### 虚析构函数
+
+虚析构函数是为了解决基类的指针指向派生类对象，并用基类的指针删除派生类对象。
+
+<details><summary>虚析构函数使用</summary> 
 
 ```cpp
 class Shape
@@ -569,32 +833,15 @@ int main()
 }
 ```
 
-* 纯虚函数 （含有纯虚函数的类叫做抽象类）
+</details>
+
+### 纯虚函数
+
+纯虚函数是一种特殊的虚函数，在基类中不能对虚函数给出有意义的实现，而把它声明为纯虚函数，它的实现留给该基类的派生类去做。
 
 ```cpp
 virtual int A() = 0;
 ```
-
-### 抽象类、接口类、聚合类
-
-* 抽象类：含有纯虚函数的类
-* 接口类：仅含有纯虚函数的抽象类
-* 聚合类：用户可以直接访问其成员，并且具有特殊的初始化语法形式。满足如下特点：
-    * 所有成员都是 public
-    * 没有有定于任何构造函数
-    * 没有类内初始化
-    * 没有基类，也没有 virtual 函数
-    * 如：
-        ```cpp
-        // 定义
-        struct Date 
-        {
-            int ival;
-            string s;
-        }
-        // 初始化
-        Data vall = { 0, "Anna" };
-        ```
 
 ### 虚函数、纯虚函数
 
@@ -608,11 +855,9 @@ virtual int A() = 0;
 ### 虚函数指针、虚函数表
 
 * 虚函数指针：在含有虚函数类的对象中，指向虚函数表，在运行时确定。
-* 虚函数表：在程序只读数据段（`.rodate section`，见：[目标文件存储结构](#%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)），存放虚函数指针，如果派生类实现了基类的某个虚函数，则在虚表中覆盖原本基类的那个虚函数指针，在编译时根据类的声明创建。
+* 虚函数表：在程序只读数据段（`.rodata section`，见：[目标文件存储结构](#%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)），存放虚函数指针，如果派生类实现了基类的某个虚函数，则在虚表中覆盖原本基类的那个虚函数指针，在编译时根据类的声明创建。
 
-### 虚继承、虚函数
-
-#### 虚继承
+### 虚继承
 
 虚继承用于解决多继承条件下的菱形继承问题（浪费存储空间、存在二义性）。
 
@@ -620,7 +865,7 @@ virtual int A() = 0;
 
 实际上，vbptr 指的是虚基类表指针（virtual base table pointer），该指针指向了一个虚基类表（virtual table），虚表中记录了虚基类与本类的偏移地址；通过偏移地址，这样就找到了虚基类成员，而虚继承也不用像普通多继承那样维持着公共基类（虚基类）的两份同样的拷贝，节省了存储空间。
 
-#### 虚继承与虚函数
+### 虚继承、虚函数
 
 * 相同之处：都利用了虚指针（均占用类的存储空间）和虚表（均不占用类的存储空间）
 * 不同之处：
@@ -630,6 +875,21 @@ virtual int A() = 0;
     * 虚函数
         * 虚函数不占用存储空间
         * 虚函数表存储的是虚函数地址
+
+### 模板类、成员模板、虚函数
+
+* 模板类中可以使用虚函数
+* 一个类（无论是普通类还是类模板）的成员模板（本身是模板的成员函数）不能是虚函数
+
+### 抽象类、接口类、聚合类
+
+* 抽象类：含有纯虚函数的类
+* 接口类：仅含有纯虚函数的抽象类
+* 聚合类：用户可以直接访问其成员，并且具有特殊的初始化语法形式。满足如下特点：
+    * 所有成员都是 public
+    * 没有有定于任何构造函数
+    * 没有类内初始化
+    * 没有基类，也没有 virtual 函数
 
 ### 内存分配和管理
 
@@ -641,6 +901,10 @@ virtual int A() = 0;
 4. alloca：在栈上申请内存。程序在出栈的时候，会自动释放内存。但是需要注意的是，alloca 不具可移植性, 而且在没有传统堆栈的机器上很难实现。alloca 不宜使用在必须广泛移植的程序中。C99 中支持变长数组 (VLA)，可以用来替代 alloca。
 
 #### malloc、free
+
+用于分配、释放内存
+
+<details><summary>malloc、free 使用</summary> 
 
 申请内存，确认是否申请成功
 
@@ -656,11 +920,17 @@ free(p);
 p = nullptr;
 ```
 
+</details>
+
 #### new、delete
 
-1. new/new[]：完成两件事，先底层调用 malloc 分了配内存，然后创建一个对象（调用构造函数）。
+1. new / new[]：完成两件事，先底层调用 malloc 分了配内存，然后调用构造函数（创建对象）。
 2. delete/delete[]：也完成两件事，先调用析构函数（清理资源），然后底层调用 free 释放空间。
 3. new 在申请内存时会自动计算所需字节数，而 malloc 则需我们自己输入申请内存空间的字节数。
+
+<details><summary>new、delete 使用</summary> 
+
+申请内存，确认是否申请成功
 
 ```cpp
 int main()
@@ -671,7 +941,23 @@ int main()
 }
 ```
 
-##### delete this 合法吗？
+</details>
+
+#### 定位 new
+
+定位 new（placement new）允许我们向 new 传递额外的参数。
+
+```cpp
+new (palce_address) type
+new (palce_address) type (initializers)
+new (palce_address) type [size]
+new (palce_address) type [size] { braced initializer list }
+```
+
+* `palce_address` 是个指针
+* `initializers` 提供一个（可能为空的）以逗号分隔的初始值列表
+
+### delete this 合法吗？
 
 [Is it legal (and moral) for a member function to say delete this?](https://isocpp.org/wiki/faq/freestore-mgmt#delete-this)
 
@@ -680,19 +966,19 @@ int main()
 1. 必须保证 this 对象是通过 `new`（不是 `new[]`、不是 placement new、不是栈上、不是全局、不是其他对象成员）分配的
 2. 必须保证调用 `delete this` 的成员函数是最后一个调用 this 的成员函数
 3. 必须保证成员函数的 `delete this ` 后面没有调用 this 了
-4. 必须保证 `delete this` 后，没有人使用了
+4. 必须保证 `delete this` 后没有人使用了
 
-#### 如何定义一个只能在堆上（栈上）生成对象的类？
+### 如何定义一个只能在堆上（栈上）生成对象的类？
 
 [如何定义一个只能在堆上（栈上）生成对象的类?](https://www.nowcoder.com/questionTerminal/0a584aa13f804f3ea72b442a065a7618)
 
-##### 只能在堆上
+#### 只能在堆上
 
 方法：将析构函数设置为私有
 
 原因：C++ 是静态绑定语言，编译器管理栈上对象的生命周期，编译器在为类对象分配栈空间时，会先检查类的析构函数的访问性。若析构函数不可访问，则不能在栈上创建对象。
 
-##### 只能在栈上
+#### 只能在栈上
 
 方法：将 new 和 delete 重载为私有
 
@@ -785,6 +1071,8 @@ unique_ptr 是 C++11 才开始提供的类型，是一种在异常时可以帮�
 
 * 由于强制转换为引用类型失败，dynamic_cast 运算符引发 bad_cast 异常。
 
+<details><summary>bad_cast 使用</summary> 
+
 ```cpp
 try {  
     Circle& ref_circle = dynamic_cast<Circle&>(ref_shape);   
@@ -793,6 +1081,8 @@ catch (bad_cast b) {
     cout << "Caught: " << b.what();  
 } 
 ```
+
+</details>
 
 ### 运行时类型信息 (RTTI) 
 
@@ -812,7 +1102,7 @@ catch (bad_cast b) {
 * type_info 类描述编译器在程序中生成的类型信息。 此类的对象可以有效存储指向类型的名称的指针。 type_info 类还可存储适合比较两个类型是否相等或比较其排列顺序的编码值。 类型的编码规则和排列顺序是未指定的，并且可能因程序而异。
 * 头文件：`typeinfo`
 
-#### 例子
+<details><summary>typeid、type_info 使用</summary>
 
 ```cpp
 class Flyable                       // 能飞的
@@ -864,6 +1154,8 @@ class doSomething(Flyable *obj)                 // 做些事情
 };
 ```
 
+</details>
+
 ### Effective C++
 
 1. 视 C++ 为一个语言联邦（C、Object-Oriented C++、Template C++、STL）
@@ -898,26 +1190,35 @@ class doSomething(Flyable *obj)                 // 做些事情
 
 ### Google C++ Style Guide
 
+<details><summary>Google C++ Style Guide 图</summary>
+
 ![Google C++ Style Guide](http://img.blog.csdn.net/20140713220242000)
 
 > 图片来源于：[CSDN . 一张图总结Google C++编程规范(Google C++ Style Guide)](http://blog.csdn.net/voidccc/article/details/37599203)
 
+</details>
+
 ## STL
 
-### 容器底层数据结构实现
+### 索引
+
+[STL 方法含义](https://github.com/huihut/interview/tree/master/STL)
+
+### 容器
 
 容器 | 底层数据结构 | 有无序 | 可不可重复 | 其他
 ---|---|---|---|---
-vector|数组|无序|可重复|支持快速随机访问
-list|双向链表|无序|可重复|支持快速增删
-deque|双端队列（一个中央控制器+多个缓冲区）|无序|可重复|支持首尾快速增删，支持随机访问
-stack|deque 或 list 封闭头端开口|无序|可重复|不用 vector 的原因应该是容量大小有限制，扩容耗时
-queue|deque 或 list 封闭底端出口和前端入口|无序|可重复|不用 vector 的原因应该是容量大小有限制，扩容耗时
-priority_queue|vector|无序|可重复|vector容器+heap处理规则
-set|红黑树|有序|不可重复|
-multiset|红黑树|有序|可重复|
-map|红黑树|有序|不可重复|
-multimap|红黑树|有序|可重复|
+[array](https://github.com/huihut/interview/tree/master/STL#array)|数组|无序|可重复|支持快速随机访问
+[vector](https://github.com/huihut/interview/tree/master/STL#vector)|数组|无序|可重复|支持快速随机访问
+[list](https://github.com/huihut/interview/tree/master/STL#list)|双向链表|无序|可重复|支持快速增删
+[deque](https://github.com/huihut/interview/tree/master/STL#deque)|双端队列（一个中央控制器+多个缓冲区）|无序|可重复|支持首尾快速增删，支持随机访问
+[stack](https://github.com/huihut/interview/tree/master/STL#stack)|deque 或 list 封闭头端开口|无序|可重复|不用 vector 的原因应该是容量大小有限制，扩容耗时
+[queue](https://github.com/huihut/interview/tree/master/STL#queue)|deque 或 list 封闭底端出口和前端入口|无序|可重复|不用 vector 的原因应该是容量大小有限制，扩容耗时
+[priority_queue](https://github.com/huihut/interview/tree/master/STL#priority_queue)|vector|无序|可重复|vector容器+heap处理规则
+[set](https://github.com/huihut/interview/tree/master/STL#set)|红黑树|有序|不可重复|
+[multiset](https://github.com/huihut/interview/tree/master/STL#multiset)|红黑树|有序|可重复|
+[map](https://github.com/huihut/interview/tree/master/STL#map)|红黑树|有序|不可重复|
+[multimap](https://github.com/huihut/interview/tree/master/STL#multimap)|红黑树|有序|可重复|
 hash_set|hash表|无序|不可重复|
 hash_multiset|hash表|无序|可重复|
 hash_map|hash表|无序|不可重复|
@@ -936,6 +1237,8 @@ hash_multimap|hash表|无序|可重复|
 
 [SqStack.cpp](DataStructure/SqStack.cpp)
 
+<details><summary>顺序栈数据结构和图片</summary>
+
 ```cpp
 typedef struct {
 	ElemType *elem;
@@ -947,7 +1250,11 @@ typedef struct {
 
 ![](images/SqStack.png)
 
+</details>
+
 #### 队列（Sequence Queue）
+
+<details><summary>队列数据结构</summary>
 
 ```cpp
 typedef struct {
@@ -958,21 +1265,33 @@ typedef struct {
 }SqQueue;
 ```
 
+</details>
+
 ##### 非循环队列
+
+<details><summary>非循环队列图片</summary>
 
 ![](images/SqQueue.png)
 
 `SqQueue.rear++`
 
+</details>
+
 ##### 循环队列
+
+<details><summary>循环队列图片</summary>
 
 ![](images/SqLoopStack.png)
 
 `SqQueue.rear = (SqQueue.rear + 1) % SqQueue.maxSize`
 
+</details>
+
 #### 顺序表（Sequence List）
 
 [SqList.cpp](DataStructure/SqList.cpp)
+
+<details><summary>顺序表数据结构和图片</summary>
 
 ```cpp
 typedef struct {
@@ -985,11 +1304,16 @@ typedef struct {
 
 ![](images/SqList.png)
 
+</details>
+
+
 ### 链式结构
 
 [LinkList.cpp](DataStructure/LinkList.cpp)
 
 [LinkList_with_head.cpp](DataStructure/LinkList_with_head.cpp)
+
+<details><summary>链式数据结构</summary>
 
 ```cpp
 typedef struct LNode {
@@ -998,23 +1322,42 @@ typedef struct LNode {
 } LNode, *LinkList; 
 ```
 
+</details>
+
 #### 链队列（Link Queue）
 
+<details><summary>链队列图片</summary>
+
 ![](images/LinkQueue.png)
+
+</details>
 
 #### 线性表的链式表示
 
 ##### 单链表（Link List）
 
+<details><summary>单链表图片</summary>
+
 ![](images/LinkList.png)
+
+</details>
+
 
 ##### 双向链表（Du-Link-List）
 
+<details><summary>双向链表图片</summary>
+
 ![](images/DuLinkList.png)
+
+</details>
 
 ##### 循环链表（Cir-Link-List）
 
+<details><summary>循环链表图片</summary>
+
 ![](images/CirLinkList.png)
+
+</details>
 
 ### 哈希表
 
@@ -1042,8 +1385,9 @@ typedef struct LNode {
 
 #### 线性探测的哈希表数据结构
 
-```cpp
+<details><summary>线性探测的哈希表数据结构和图片</summary>
 
+```cpp
 typedef char KeyType;
 
 typedef struct {
@@ -1057,7 +1401,11 @@ typedef struct {
 	bool *tag;
 }HashTable;
 ```
+
 ![](images/HashTable.png)
+
+</details>
+
 
 ### 递归
 
@@ -1084,6 +1432,8 @@ typedef struct {
 
 ##### 头尾链表存储表示
 
+<details><summary>广义表的头尾链表存储表示和图片</summary>
+
 ```cpp
 // 广义表的头尾链表存储表示
 typedef enum {ATOM, LIST} ElemTag;
@@ -1105,7 +1455,11 @@ typedef struct GLNode {
 
 ![](images/GeneralizedList1.png)
 
+</details>
+
 ##### 扩展线性链表存储表示
+
+<details><summary>扩展线性链表存储表示和图片</summary>
 
 ```cpp
 // 广义表的扩展线性链表存储表示
@@ -1126,6 +1480,8 @@ typedef struct GLNode1 {
 
 ![](images/GeneralizedList2.png)
 
+</details>
+
 ### 二叉树
 
 [BinaryTree.cpp](DataStructure/BinaryTree.cpp)
@@ -1143,6 +1499,8 @@ typedef struct GLNode1 {
 
 #### 存储结构
 
+<details><summary>二叉树数据结构</summary>
+
 ```cpp
 typedef struct BiTNode
 {
@@ -1151,13 +1509,24 @@ typedef struct BiTNode
 }BiTNode, *BiTree;
 ```
 
+</details>
+
+
 ##### 顺序存储
+
+<details><summary>二叉树顺序存储图片</summary>
 
 ![](images/SqBinaryTree.png)
 
+</details>
+
 ##### 链式存储
 
+<details><summary>二叉树链式存储图片</summary>
+
 ![](images/LinkBinaryTree.png)
+
+</details>
 
 #### 遍历方式
 
@@ -1200,7 +1569,11 @@ typedef struct BiTNode
 * 平衡二叉树必定是二叉搜索树，反之则不一定
 * 最小二叉平衡树的节点的公式：`F(n)=F(n-1)+F(n-2)+1` （1 是根节点，F(n-1) 是左子树的节点数量，F(n-2) 是右子树的节点数量）
 
+<details><summary>平衡二叉树图片</summary>
+
 ![](images/Self-balancingBinarySearchTree.png)
+
+</details>
 
 ##### 最小失衡树
 
@@ -1240,7 +1613,11 @@ typedef struct BiTNode
 
 #### B 树（B-tree）、B+ 树（B+-tree）
 
+<details><summary>B 树、B+ 树图片</summary>
+
 ![B 树（B-tree）、B+ 树（B+-tree）](https://i.stack.imgur.com/l6UyF.png)
+
+</details>
 
 ##### 特点
 
@@ -1269,7 +1646,11 @@ typedef struct BiTNode
 
 #### 八叉树
 
+<details><summary>八叉树图片</summary>
+
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Octree2.png/400px-Octree2.png)
+
+</details>
 
 八叉树（octree），或称八元树，是一种用于描述三维空间（划分空间）的树状数据结构。八叉树的每个节点表示一个正方体的体积元素，每个节点有八个子节点，这八个子节点所表示的体积元素加在一起就等于父节点的体积。一般中心点作为节点的分叉中心。
 
@@ -1301,7 +1682,7 @@ typedef struct BiTNode
 > * k：代表数值中的 “数位” 个数
 > * n：代表数据规模
 > * m：代表数据的最大值减最小值
-> * 来自 [wikipedia . 排序算法](https://zh.wikipedia.org/wiki/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95)
+> * 来自：[wikipedia . 排序算法](https://zh.wikipedia.org/wiki/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95)
 
 ### 查找
 
@@ -1331,6 +1712,20 @@ B树/B+树 |O(log<sub>2</sub>n) |   |
 
 * [Github . haoel/leetcode](https://github.com/haoel/leetcode)
 * [Github . pezy/LeetCode](https://github.com/pezy/LeetCode)
+
+### 剑指 Offer
+
+* [Github . zhedahht/CodingInterviewChinese2](https://github.com/zhedahht/CodingInterviewChinese2)
+* [Github . gatieme/CodingInterviews](https://github.com/gatieme/CodingInterviews)
+
+### Cracking the Coding Interview 程序员面试金典
+
+* [Github . careercup/ctci](https://github.com/careercup/ctci)
+* [牛客网 . 程序员面试金典](https://www.nowcoder.com/ta/cracking-the-coding-interview)
+
+### 牛客网
+
+* [牛客网 . 在线编程专题](https://www.nowcoder.com/activity/oj)
 
 ## 操作系统
 
@@ -1392,7 +1787,7 @@ B树/B+树 |O(log<sub>2</sub>n) |   |
 
 线程间的通信目的主要是用于线程同步，所以线程没有像进程通信中的用于数据交换的通信机制  
 
-> 进程线程部分知识点来源于：[进程线程面试题总结](http://blog.csdn.net/wujiafei_njgcxy/article/details/77098977)
+> 进程之间的通信方式以及优缺点来源于：[进程线程面试题总结](http://blog.csdn.net/wujiafei_njgcxy/article/details/77098977)
 
 #### 进程之间私有和共享的资源
 
@@ -1403,6 +1798,36 @@ B树/B+树 |O(log<sub>2</sub>n) |   |
 
 * 私有：线程栈，寄存器，程序寄存器
 * 共享：堆，地址空间，全局变量，静态变量
+
+#### 多进程与多线程间的对比、优劣与选择
+
+##### 对比
+
+对比维度 | 多进程 | 多线程 | 总结
+---|---|---|---
+数据共享、同步|数据共享复杂，需要用 IPC；数据是分开的，同步简单|因为共享进程数据，数据共享简单，但也是因为这个原因导致同步复杂|各有优势
+内存、CPU|占用内存多，切换复杂，CPU 利用率低|占用内存少，切换简单，CPU 利用率高|线程占优
+创建销毁、切换|创建销毁、切换复杂，速度慢|创建销毁、切换简单，速度很快|线程占优
+编程、调试|编程简单，调试简单|编程复杂，调试复杂|进程占优
+可靠性|进程间不会互相影响|一个线程挂掉将导致整个进程挂掉|进程占优
+分布式|适应于多核、多机分布式；如果一台机器不够，扩展到多台机器比较简单|适应于多核分布式|进程占优
+
+##### 优劣
+
+优劣|多进程|多线程
+---|---|---
+优点|编程、调试简单，可靠性较高|创建、销毁、切换速度快，内存、资源占用小
+缺点|创建、销毁、切换速度慢，内存、资源占用大|编程、调试复杂，可靠性较差
+
+##### 选择
+
+* 需要频繁创建销毁的优先用线程
+* 需要进行大量计算的优先使用线程
+* 强相关的处理用线程，弱相关的处理用进程
+* 可能要扩展到多机分布的用进程，多核分布的用线程
+* 都满足需求的情况下，用你最熟悉、最拿手的方式
+
+> 多进程与多线程间的对比、优劣与选择来自：[多线程还是多进程的选择及区别](https://blog.csdn.net/lishenglong666/article/details/8557215)
 
 ### Linux 内核的同步方式
 
@@ -1422,7 +1847,7 @@ B树/B+树 |O(log<sub>2</sub>n) |   |
 * 读-拷贝修改(RCU，Read-Copy Update)
 * 顺序锁（seqlock）
 
-> 来自[Linux 内核的同步机制，第 1 部分](https://www.ibm.com/developerworks/cn/linux/l-synch/part1/)、[Linux 内核的同步机制，第 2 部分](https://www.ibm.com/developerworks/cn/linux/l-synch/part2/)
+> 来自：[Linux 内核的同步机制，第 1 部分](https://www.ibm.com/developerworks/cn/linux/l-synch/part1/)、[Linux 内核的同步机制，第 2 部分](https://www.ibm.com/developerworks/cn/linux/l-synch/part2/)
 
 ### 死锁
 
@@ -1473,10 +1898,17 @@ B树/B+树 |O(log<sub>2</sub>n) |   |
 大端|12|34|56|78
 小端|78|56|34|12
 
+
+<details><summary>大端小端图片</summary>
+
 ![大端序](images/CPU-Big-Endian.svg.png)
 ![小端序](images/CPU-Little-Endian.svg.png)
 
+</details>
+
 ##### 判断大端小端
+
+<details><summary>判断大端小端</summary>
 
 可以这样判断自己 CPU 字节序是大端还是小端：
 
@@ -1496,6 +1928,9 @@ int main()
 	return 0;
 }
 ```
+
+</details>
+
 ##### 各架构处理器的字节序
 
 * x86（Intel、AMD）、MOS Technology 6502、Z80、VAX、PDP-11 等处理器为小端序；
@@ -1696,11 +2131,11 @@ TCP 首部
 
 TCP：状态控制码（Code，Control Flag），占 6 比特，含义如下：
 * URG：紧急比特（urgent），当 `URG＝1` 时，表明紧急指针字段有效，代表该封包为紧急封包。它告诉系统此报文段中有紧急数据，应尽快传送(相当于高优先级的数据)， 且上图中的 Urgent Pointer 字段也会被启用。
-* ACK: 确认比特（Acknowledge）。只有当 `ACK＝1` 时确认号字段才有效，代表这个封包为确认封包。当 `ACK＝0` 时，确认号无效。
-* PSH: （Push function）若为 1 时，代表要求对方立即传送缓冲区内的其他对应封包，而无需等缓冲满了才送。
-* RST: 复位比特(Reset)，当 `RST＝1` 时，表明 TCP 连接中出现严重差错（如由于主机崩溃或其他原因），必须释放连接，然后再重新建立运输连接。
-* SYN: 同步比特(Synchronous)，SYN 置为 1，就表示这是一个连接请求或连接接受报文，通常带有 SYN 标志的封包表示『主动』要连接到对方的意思。
-* FIN: 终止比特(Final)，用来释放一个连接。当 `FIN＝1` 时，表明此报文段的发送端的数据已发送完毕，并要求释放运输连接。
+* ACK：确认比特（Acknowledge）。只有当 `ACK＝1` 时确认号字段才有效，代表这个封包为确认封包。当 `ACK＝0` 时，确认号无效。
+* PSH：（Push function）若为 1 时，代表要求对方立即传送缓冲区内的其他对应封包，而无需等缓冲满了才送。
+* RST：复位比特(Reset)，当 `RST＝1` 时，表明 TCP 连接中出现严重差错（如由于主机崩溃或其他原因），必须释放连接，然后再重新建立运输连接。
+* SYN：同步比特(Synchronous)，SYN 置为 1，就表示这是一个连接请求或连接接受报文，通常带有 SYN 标志的封包表示『主动』要连接到对方的意思。
+* FIN：终止比特(Final)，用来释放一个连接。当 `FIN＝1` 时，表明此报文段的发送端的数据已发送完毕，并要求释放运输连接。
 
 #### UDP
 
@@ -1809,7 +2244,11 @@ TCP 是一个基于字节流的传输服务（UDP 基于报文的），“流”
 
 #### TCP 有限状态机
 
+<details><summary>TCP 有限状态机图片</summary>
+
 ![TCP 的有限状态机](images/TCP的有限状态机.png)
+
+</details>
 
 ### 应用层
 
@@ -1869,7 +2308,7 @@ PUT | 从客户端向服务器传送的数据取代指定的文档的内容
 DELETE | 请求服务器删除指定的页面
 TRACE | 回显服务器收到的请求，主要用于测试或诊断
 
-状态吗（Status-Code）
+状态码（Status-Code）
 
 * 1xx：表示通知信息，如请求收到了或正在进行处理
     * 100 Continue：继续，客户端应继续其请求
@@ -1889,7 +2328,7 @@ TRACE | 回显服务器收到的请求，主要用于测试或诊断
     * 503 Service Unavailable: 由于超载或系统维护，服务器暂时的无法处理客户端的请求。延时的长度可包含在服务器的 Retry-After 头信息中
     * 504 Gateway Timeout: 充当网关或代理的服务器，未及时从远端服务器获取请求
 
-> [菜鸟教程 . HTTP状态码](http://www.runoob.com/http/http-status-codes.html)
+> 更多状态码：[菜鸟教程 . HTTP状态码](http://www.runoob.com/http/http-status-codes.html)
 
 ##### 其他协议
 
@@ -2148,6 +2587,8 @@ Linux 下的共享库就是普通的 ELF 共享对象。
 
 ### Windows 的动态链接库（Dynamic-Link Library）
 
+<details><summary>Windows 动态链接库例子</summary>
+
 DLL 头文件
 ```cpp
 #ifdef __cplusplus
@@ -2182,6 +2623,8 @@ MODULE_API int module_init()
     return 0;
 }
 ```
+
+</details>
 
 ### 运行库（Runtime Library）
 
@@ -2259,17 +2702,35 @@ MODULE_API int module_init()
 
 ## 书籍
 
-* 《剑指 Offer》
-* 《编程珠玑》
-* 《深度探索 C++ 对象模型》
+### 语言
+
+* 《C++ Primer》
 * 《Effective C++》
 * 《More Effective C++》
+* 《深度探索 C++ 对象模型》
 * 《深入理解 C++11》
 * 《STL 源码剖析》
-* 《深入理解计算机系统》
-* 《TCP/IP 网络编程》
-* 《程序员的自我修养》
+
+### 算法
+
+* 《剑指 Offer》
+* 《编程珠玑》
 * 《程序员面试宝典》
+
+### 系统
+
+* 《深入理解计算机系统》
+* 《Windows 核心编程》
+* 《Unix 环境高级编程》
+
+### 网络
+
+* 《Unix 网络编程》
+* 《TCP/IP 详解》
+
+### 其他
+
+* 《程序员的自我修养》
 
 ## 复习刷题网站
 
